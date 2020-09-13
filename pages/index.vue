@@ -1,5 +1,6 @@
 <template>
   <div class="wrapper main-page">
+    <notice :notice="notice" v-if="notice" :err="err" />
     <div class="main-page__form">
       <h1 class="main-page__form-title">Добавить</h1>
       <Form @addNewPost="addNewPost" />
@@ -12,25 +13,33 @@
 </template>
 
 <script>
+import Notice from '@/components/notice.vue'
 import PostList from '@/components/PostList.vue'
 import Form from '@/components/Form.vue'
 export default {
   name: 'MainPage',
   components: {
+    Notice,
     PostList,
     Form,
   },
   data() {
     return {
       postList: [],
+      notice: '',
+      err: false,
     }
   },
   methods: {
     addNewPost(data) {
-      if (this.disabled) {
-        return console.log('disabled')
-      }
-      this.$axios.post('/posts', data)
+      this.$axios.post('/posts', data).then((res) => {
+        if (res.status === 201) {
+          this.notice = 'Пост успешно добавлен'
+          setTimeout(() => {
+            this.notice = ''
+          }, 2000)
+        }
+      })
       this.postList = [...this.postList, data]
     },
     async getPostList() {
@@ -47,7 +56,16 @@ export default {
     },
     removePost(id) {
       this.postList = this.postList.filter((i) => i.id != id)
-      this.$axios.delete(`/posts/:${id}`)
+      this.$axios.delete(`/posts/:${id}`).then((res) => {
+        if (res.status === 200) {
+          this.notice = 'Пост удален'
+          this.err = true
+          setTimeout(() => {
+            this.notice = ''
+            this.err = false
+          }, 2000)
+        }
+      })
     },
   },
   mounted() {
