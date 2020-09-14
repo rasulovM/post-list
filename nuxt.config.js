@@ -63,7 +63,7 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: process.env.NUXT_APP_BASE_API_URL,
+    baseURL: 'https://jsonplaceholder.typicode.com',
   },
   /*
    ** Content module configuration
